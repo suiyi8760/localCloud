@@ -1,0 +1,26 @@
+.main_content .container-fluid>div .thumbnail{
+    padding-top: 30px;
+}
+
+.paging{
+    padding-bottom: 26px;
+}
+
+.pagination {
+    display: block;
+    width: 232px;
+    margin: 20px auto;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 500px) {
+    .modal-dialog {
+        width: 500px;
+        margin: 30px auto;
+    }
+}
+
+#loginModal .notice{
+    text-align: center;
+    color:#ac2925;
+}

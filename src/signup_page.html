@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="css/lib/bootstrap/bootstrap.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .signUp_panel {
+      margin: 20px auto;
+      width: 500px;
+    }
+
+    @media screen and (max-width: 500px) {
+      .signUp_panel {
+        width: 100%;
+      }
+    }
+
+    .signUp_panel .page-header h1 {
+      font-weight: bold;
+    }
+
+    .signUp_panel .page-header small {
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    .signUp_panel .back_btn {
+      display: block;
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
+
+    .signUp_panel .back_btn img {
+      width: 100%;
+    }
+
+    .signUp_panel form .control-label{
+      float: right;
+      display: none;
+    }
+
+    .signUp_panel form .has-error .control-label{
+      display: inline;
+    }
+
+    .pre-block {
+      margin-top: 12px;
+      width: 100px;
+      height: 100px;
+    }
+
+    .pre-block img {
+      width: 100%;
+    }
+
+    .notice-msg{
+      margin-left: 10px;
+      font-size: 18px;
+      color:#ac2925;
+    }
+  </style>
+
+  <title>加入我们</title>
+</head>
+
+<body>
+<div id="signUp">
+  <div class="signUp_panel">
+    <div class="container-fluid">
+      <a href="/" class="back_btn">
+        <img src="img/back.png" alt="">
+      </a>
+      <div class="page-header">
+        <h1>欢迎
+          <small> 请填写以下信息</small>
+        </h1>
+      </div>
+      <form>
+        <div class="form-group">
+          <span class="control-label">该信息不可为空</span>
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"
+                 v-model="signUpInfo.mailId">
+        </div>
+        <div class="form-group">
+          <span class="control-label">该信息不可为空</span>
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
+                 v-model="signUpInfo.password">
+        </div>
+        <div class="form-group">
+          <span class="control-label">该信息不可为空</span>
+          <label for="reInputPassword1">Confirm Password</label>
+          <input type="password" class="form-control" id="reInputPassword1" placeholder="Password"
+                 v-model="signUpInfo.repassword" @blur="confirmPass">
+        </div>
+        <div class="form-group">
+          <span class="control-label">该信息不可为空</span>
+          <label for="exampleUserName">昵称</label>
+          <input type="text" class="form-control" id="exampleUserName" placeholder="请填入昵称中英文皆可"
+                 v-model="signUpInfo.username">
+        </div>
+        <div class="form-group">
+          <span class="control-label">该信息不可为空</span>
+          <label for="exampleUserAge">年龄</label>
+          <input type="text" class="form-control" id="exampleUserAge" placeholder="年龄不可为零" v-model="signUpInfo.age">
+        </div>
+        <div class="form-group">
+          <label for="gravatarInputFile">上传头像</label>
+          <div>
+            <input type="file" id="gravatarInputFile" @change="upChange" style="display: none;">
+            <button class="upload-gravatar btn btn-primary btn-xs" @click="upGravatar">本地上传</button>
+            <button class="reset-gravatar btn btn-default btn-xs" @click="resetPre">重置预览</button>
+          </div>
+          <div class="pre-block">
+            <img :src="signUpInfo.graSrc" alt="头像预览">
+          </div>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox"> 已同意注意事项
+          </label>
+        </div>
+        <button class="btn btn-default submit_btn" @click="signUp">注册</button>
+        <span class="notice-msg" v-show="isNotice">{{returnMsg}}</span>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="js/lib/jquery/jquery.js"></script>
+<script src="js/lib/bootstrap/bootstrap.js"></script>
+<script src="js/lib/vue/vue.js"></script>
+<script src="js/lib/vue/vue-resource.js"></script>
+<script>
+  new Vue({
+    data: {
+      signUpInfo: {
+        mailId: '',
+        password: '',
+        repassword:'',
+        username: '',
+        age: '',
+        graSrc: 'img/defGravatar.png'
+      },
+      isNotice:false,
+      returnMsg:'',
+      noticeMsg: ''
+    },
+    methods: {
+      upChange(e){
+        //fileinput打开文件窗口同样会触发change事件,同样会获取files内容,需要作非空判断
+        if (e.target.files.length) {
+          const file = e.target.files[0];
+          const vm = this;
+
+          if (!/image\/\w+/.test(file.type)) {
+            alert("文件必须为图片！");
+//            return false取消默认事件,防止alert后依然弹出文件窗口
+            return false;
+          }
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = function () {
+            vm.signUpInfo.graSrc = this.result;
+          }
+        }
+      },
+      upGravatar(e){
+        e.preventDefault();
+        $('#gravatarInputFile').trigger('click')
+      },
+      resetPre(e){
+        e.preventDefault();
+        this.signUpInfo.graSrc = 'img/defGravatar.png';
+      },
+      confirmPass(e){
+        if(this.signUpInfo.password!=''&&this.signUpInfo.repassword!=''&&this.signUpInfo.password!=this.signUpInfo.repassword){
+          $('input[type="password"]').siblings('span').html('需要输入相同密码').parent().addClass('has-error');
+        } else {
+          $('input[type="password"]').parent().removeClass('has-error');
+        }
+      },
+      signUp(e){
+        e.preventDefault();
+        if (this.signUpInfo.emailId == "" || this.signUpInfo.password == "" || this.signUpInfo.age == "") {
+//          为空的表单添加提示信息
+          $('.form-control').each((index,ele)=>{
+            $(ele).parent().removeClass('has-error');
+            if(ele.value==""){
+              $(ele).siblings('span').html('该信息不可为空').parent().addClass('has-error');
+            }
+          })
+        }else if(this.signUpInfo.password!=this.signUpInfo.repassword){
+          $('input[type="password"]').blur();
+        } else {
+          this.$http.post('api/user/signUp', this.signUpInfo)
+            .then(res => {
+              if(!res.data.status){
+                this.returnMsg = res.data.msg;
+                this.isNotice = true;
+              } else {
+//                登陆成功跳转回主页
+                window.location.href="/";
+              }
+            })
+            .catch(err => {
+              console.log('数据请求错误');
+            })
+        }
+      }
+    }
+  }).$mount('#signUp');
+</script>
+</body>
+
+</html>
